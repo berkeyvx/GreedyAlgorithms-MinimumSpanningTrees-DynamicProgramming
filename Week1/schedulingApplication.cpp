@@ -19,8 +19,13 @@
 #include <utility>
 #include <climits>
 #include <vector>
+#include <fstream>
+
 
 void sortByRatio(std::vector<std::pair<std::pair<int,int>, double>> &schedule);
+void sortByDifference(std::vector<std::pair<std::pair<int,int>, double>> &sch);
+long long sumOfWeightedCompletionTimes(std::vector<std::pair<std::pair<int,int>, double>> &schedule);
+void readJobFilesToVector(std::vector<std::pair<std::pair<int,int>, double>> &schedule);
 
 
 int main(int argc, char const *argv[])
@@ -28,18 +33,16 @@ int main(int argc, char const *argv[])
     // pair.first.first = weight, pair.first.second = length, pair.second = Ratio
     std::vector<std::pair<std::pair<int, int>, double>> schedule;
     
-    // Jobs to be scheduled
-    schedule.push_back(std::make_pair(std::make_pair(3, 5), INT_MIN));
-    schedule.push_back(std::make_pair(std::make_pair(1, 2), INT_MIN));
-    schedule.push_back(std::make_pair(std::make_pair(5, 3), INT_MIN));
-    
+    readJobFilesToVector(schedule);
+
+    sortByDifference(schedule);
+    std::cout << "Completion Times Weighted Sum using Difference: " << sumOfWeightedCompletionTimes(schedule) << "\n";
+
     sortByRatio(schedule);
-    
-    for (auto &iii : schedule) {
-        std::cout << "Weight: " << iii.first.first << "\tLength: " << iii.first.second << "\tRatio: " << iii.second << "\n";
-    }
+    std::cout << "Completion Time Weighted Sum using Ratio: " << sumOfWeightedCompletionTimes(schedule);
     return 0;
 }
+
 
 
 void sortByRatio(std::vector<std::pair<std::pair<int,int>, double>> &schedule){
@@ -52,3 +55,76 @@ void sortByRatio(std::vector<std::pair<std::pair<int,int>, double>> &schedule){
         return lRatio > rRatio;
     });
 }
+
+
+
+void sortByDifference(std::vector<std::pair<std::pair<int,int>, double>> &schedule){
+    std::sort(schedule.begin(), schedule.end(), [](std::pair<std::pair<int, int>, double> &l,
+                                                   std::pair<std::pair<int,int>, double> &r){
+        double lRatio = static_cast<double>(l.first.first)-l.first.second;
+        l.second = lRatio;
+        double rRatio = static_cast<double>(r.first.first)-r.first.second;
+        r.second = rRatio;
+
+        if(lRatio == rRatio){
+            return l.first.first > r.first.first;
+        }
+
+        return lRatio > rRatio;
+    });
+}
+
+
+long long sumOfWeightedCompletionTimes(std::vector<std::pair<std::pair<int,int>, double>> &schedule){
+    int timePassed = 0;
+    long long weightedCompletionTime = 0;
+
+    for(auto &iii: schedule){
+        timePassed += iii.first.second;
+        weightedCompletionTime += timePassed * iii.first.first;
+        // how many time passed
+        //timePassed += iii.first.second;
+    }
+
+    return weightedCompletionTime;
+}
+
+
+
+void readJobFilesToVector(std::vector<std::pair<std::pair<int,int>, double>> &schedule){
+    std::ifstream file("jobs.txt");
+    std::string line;
+    getline(file,line);
+    schedule.reserve(std::stoi(line));
+
+
+    int strIndex = 0;
+    int weight = 0;
+    int length = 0;
+    while(getline(file, line, '\n')){
+        // Split index by ' ' and push jobs in vector
+
+        // Find weight
+        weight = std::stoi(line);
+
+        // Find length
+        while(line[strIndex] != ' '){
+            strIndex++;
+        }
+        strIndex++;
+
+        length = line[strIndex] - '0';
+        strIndex++;
+        while(line[strIndex] >= '0' && line[strIndex] <= '9'){
+            length *= 10;
+            length += line[strIndex] - '0';
+            strIndex++;
+        }
+        schedule.push_back(std::make_pair(std::make_pair(weight, length),INT_MIN));
+        
+        strIndex = 0;
+        weight = 0;
+        length = 0;
+    }
+}
+
