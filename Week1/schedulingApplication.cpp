@@ -20,7 +20,7 @@
 #include <climits>
 #include <vector>
 #include <fstream>
-
+#include <algorithm>
 
 void sortByRatio(std::vector<std::pair<std::pair<int,int>, double>> &schedule);
 void sortByDifference(std::vector<std::pair<std::pair<int,int>, double>> &sch);
