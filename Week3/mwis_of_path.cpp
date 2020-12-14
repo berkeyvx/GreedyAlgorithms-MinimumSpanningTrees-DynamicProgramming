@@ -42,6 +42,8 @@ std::string inArray(const std::array<int, 8> arr)
     std::set<long> s;
 
 
+    // obtain the which vertices are in M-W independent set
+    // Reconstruction algorithm
     long i = v.size() + 1;
     while (i >= 1)
     {
@@ -54,6 +56,7 @@ std::string inArray(const std::array<int, 8> arr)
         }
     }
     
+    // Construct a string for task
     for (auto &&i : arr)
     {
         if(s.find(i) != s.end())
@@ -71,8 +74,9 @@ std::string inArray(const std::array<int, 8> arr)
     
 }
 
-// should return *(result.end() - 1) which is long
-// we returned vector of long for sake of the task
+// linear time algorithm for finding maximum weight independent set of path graph
+// maximum weight is equal to *(result.end() - 1)
+// we return vector because of reconstruction algorithm
 std::vector<long> mwis(std::vector<long> path)
 {
     std::vector<long> result;
