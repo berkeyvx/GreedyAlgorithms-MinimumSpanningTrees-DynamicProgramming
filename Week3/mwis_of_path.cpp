@@ -44,10 +44,18 @@ std::string inArray(const std::array<int, 8> arr)
 
     // obtain the which vertices are in M-W independent set
     // Reconstruction algorithm
-    long i = v.size() + 1;
+    long i = v.size();
+
+    // temporary fix for MWIS array because MWIS array index start at 1
+    // a[i-1] >= a[i-2] + wi
+    // Array a index starts at 1, Wi denoted ith vertex 
+    // we insert 1 arbitrary element at the beginning of a[] and we increment their index by 1
+    mwisVec.insert(mwisVec.begin(), 0);
+
     while (i >= 1)
     {
-        if (mwisVec[i-1] >= (mwisVec[i-2] + v[i-1]))
+        std::cout << i << "\n";
+        if (mwisVec.at(i) >= (mwisVec.at(i-1) + v.at(i-1)))
             i--;
         else
         {
@@ -55,6 +63,9 @@ std::string inArray(const std::array<int, 8> arr)
             i -= 2;
         }
     }
+
+    // remove arbitrary element
+    mwisVec.erase(mwisVec.begin());
     
     // Construct a string for task
     for (auto &&i : arr)
@@ -81,7 +92,7 @@ std::vector<long> mwis(std::vector<long> path)
 {
     std::vector<long> result;
     result.push_back(0);
-    result.push_back(path[0]);
+    result.push_back(path.at(0));
 
     for(size_t i = 2; i < path.size() + 1; i++)
     {
@@ -91,7 +102,7 @@ std::vector<long> mwis(std::vector<long> path)
 
     for (size_t i = 2; i < path.size() + 1; i++)
     {
-        result[i] = std::max(result[i-1], result[i-2] + path[i-1]);
+        result[i] = std::max(result.at(i-1), result.at(i-2) + path.at(i-1));
     }
     
     return result;
