@@ -26,6 +26,7 @@ std::string inArray(const std::array<int, 8> arr);
 
 int main(int argc, char const *argv[])
 {
+    // vertex index
     const std::array<int, 8> test {1, 2, 3, 4, 17, 117, 517, 997};
     std::cout << inArray(test);
     return 0;
@@ -44,33 +45,24 @@ std::string inArray(const std::array<int, 8> arr)
 
     // obtain the which vertices are in M-W independent set
     // Reconstruction algorithm
-    long i = v.size();
-
-    // temporary fix for MWIS array because MWIS array index start at 1
-    // a[i-1] >= a[i-2] + wi
-    // Array a index starts at 1, Wi denoted ith vertex 
-    // we insert 1 arbitrary element at the beginning of a[] and we increment their index by 1
-    mwisVec.insert(mwisVec.begin(), 0);
+    long i = mwisVec.size() - 1;
 
     while (i >= 1)
     {
-        std::cout << i << "\n";
-        if (mwisVec.at(i) >= (mwisVec.at(i-1) + v.at(i-1)))
+        if (mwisVec.at(i) >= (mwisVec.at(i-1) + v.at(i-2)))
             i--;
         else
         {
-            s.insert(i);
+            s.insert(i-2);
             i -= 2;
         }
     }
 
-    // remove arbitrary element
-    mwisVec.erase(mwisVec.begin());
     
     // Construct a string for task
     for (auto &&i : arr)
     {
-        if(s.find(i) != s.end())
+        if(s.find(i-1) != s.end())
         {
             result.append("1");
         }
